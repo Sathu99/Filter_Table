@@ -5,29 +5,42 @@ import MultipleSelect from '../MultipleSelect/MultipleSelect';
 import { TextField } from '@material-ui/core';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { FilterType } from '../Table/table';
-import { act, col } from './data';
+import { act } from './data';
 import { StyledMenu, useStyles } from './styles';
+import { Column } from '../Table/data';
 
 export type Threetype = {
   filterFields: FilterType;
+  filterableCol: Column[];
   handleFilter: (value: FilterType) => void;
 };
 
 const Filter = (props: Threetype) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const col: string[] = props.filterableCol.map((column) => {
+    return column.label;
+  });
+  const handleAct = (event: React.ChangeEvent<{ value: unknown }>): void => {
+    props.handleFilter({
+      ...props.filterFields,
+      actions: event.target.value as string,
+    });
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleClose = (e: unknown,reason:string) => {
+    console.log(e,reason);
+
     props.handleFilter({
       columns: [],
-      actions: [],
+      actions: '',
       value: '',
     });
+    setAnchorEl(null);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +49,7 @@ const Filter = (props: Threetype) => {
       value: event.target.value as string,
     });
   };
+  console.log(props);
 
   return (
     <div>
@@ -63,7 +77,23 @@ const Filter = (props: Threetype) => {
               <MultipleSelect lable="Columns" {...props} options={col} />
             </Grid>
             <Grid item lg>
-              <MultipleSelect lable="Actions" {...props} options={act} />
+              <TextField
+                select
+                label="Actions"
+                onChange={handleAct}
+                value={props.filterFields.actions}
+                className={classes.inputField}
+                SelectProps={{
+                  native: true,
+                }}
+              >
+                <option value="" disabled></option>
+                {act.map((ac, index) => (
+                  <option key={index} value={ac.toLowerCase()}>
+                    {ac}
+                  </option>
+                ))}
+              </TextField>
             </Grid>
             <Grid item lg>
               <TextField
@@ -71,6 +101,7 @@ const Filter = (props: Threetype) => {
                 label="Value"
                 className={classes.inputField}
                 onChange={handleChange}
+                value={props.filterFields.value}
               />
             </Grid>
           </Grid>

@@ -11,17 +11,20 @@ export const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
-      height: 100,
+      height: 70,
+      padding: 5,
+      // marginBottom:10
     },
     button: {
       margin: theme.spacing(1),
     },
-    inputField: { margin: theme.spacing(1), minWidth: 120, maxWidth: 300 },
+    inputField: { margin: theme.spacing(1), minWidth: 100, maxWidth: 150 },
   })
 );
 export const StyledMenu = withStyles({
   paper: {
-    border: '1px solid #d3d4d5',
+    border: '1px solid grey',
+    margin: 3,
   },
 })((props: MenuProps) => (
   <Menu

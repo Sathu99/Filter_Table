@@ -7,7 +7,7 @@ export interface Column {
 
 export const columns: Column[] = [
   { id: 'name', label: 'Name', minWidth: 170 },
-  { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
+  { id: 'code', label: 'Code', minWidth: 100 },
   {
     id: 'population',
     label: 'Population',
@@ -16,7 +16,7 @@ export const columns: Column[] = [
   },
   {
     id: 'size',
-    label: 'Size\u00a0(km\u00b2)',
+    label: 'Size',
     minWidth: 170,
     align: 'right',
   },

@@ -7,15 +7,4 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export type TablePaginationActionsProps = {
-  count: number;
-  page: number;
-  rowsPerPage: number;
-  onPageChange: (
-    event:
-      | React.MouseEvent<HTMLButtonElement>
-      | React.ChangeEvent<HTMLInputElement>
-      | null,
-    newPage: number
-  ) => void;
-};
+

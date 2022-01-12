@@ -19,15 +19,18 @@ const MenuProps = {
       width: 250,
     },
   },
-  getContentAnchorEl: null,
-  anchorOrigin: {
-    vertical: 'bottom',
-    horizontal: 'center',
-  },
-  transformOrigin: {
-    vertical: 'top',
-    horizontal: 'center',
-  },
+  // anchorEl: () => {
+  //   return {
+  //     anchorOrigin: {
+  //       vertical: 'bottom',
+  //       horizontal: 'center',
+  //     },
+  //     transformOrigin: {
+  //       vertical: 'top',
+  //       horizontal: 'center',
+  //     },
+  //   };
+  // },
 };
 
 export { useStyles, MenuProps };

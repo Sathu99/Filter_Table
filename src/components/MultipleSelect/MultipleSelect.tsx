@@ -6,7 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
-import { MenuProps, useStyles } from './styles';
+import { useStyles } from './styles';
 import { FilterType } from '../Table/table';
 
 export type SelectTypes = {
@@ -18,11 +18,9 @@ export type SelectTypes = {
 
 const MultipleSelect = (props: SelectTypes) => {
   const classes = useStyles();
-  const [personName, setPersonName] = React.useState<string[]>([]);
   const inputObj: { [key: string]: string[] } = {};
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setPersonName(event.target.value as string[]);
     inputObj[props.lable.toLowerCase()] = event.target.value as string[];
     props.handleFilter({ ...props.filterFields, ...inputObj });
   };
@@ -35,16 +33,20 @@ const MultipleSelect = (props: SelectTypes) => {
           labelId="demo-mutiple-checkbox-label"
           id="demo-mutiple-checkbox"
           multiple
-          value={personName}
+          value={props.filterFields.columns}
           onChange={handleChange}
           input={<Input />}
           renderValue={(selected) => (selected as string[]).join(', ')}
-          MenuProps={MenuProps}
+          // MenuProps={MenuProps}
         >
-          {props.options.map((name) => (
-            <MenuItem key={name.toLowerCase()} value={name.toLowerCase()}>
-              <Checkbox checked={personName.indexOf(name.toLowerCase()) > -1} />
-              <ListItemText primary={name} />
+          {props.options.map((colName) => (
+            <MenuItem key={colName.toLowerCase()} value={colName.toLowerCase()}>
+              <Checkbox
+                checked={
+                  props.filterFields.columns.indexOf(colName.toLowerCase()) > -1
+                }
+              />
+              <ListItemText primary={colName} />
             </MenuItem>
           ))}
         </Select>

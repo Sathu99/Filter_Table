@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent, ChangeEvent } from 'react';
 import {
   TableFooter,
   Toolbar,
@@ -14,37 +14,34 @@ import {
 import SearchIcon from '@material-ui/icons/Search';
 import TablePaginationActions from '../Pagination/TablePagination';
 import { StyledTableCell, StyledTableRow, useStyles } from './styles';
-import { columns, OriginalRows, originalRows } from './data';
+import { Column, columns, OriginalRows, originalRows } from './data';
 import Filter from '../Filter/Filter';
 import ColumnsAct from '../Columns/Columns';
-
 export type FilterType = {
   [key: string]: string | string[] | undefined;
   columns: string[];
-  actions: string[];
+  actions: string;
   value: string;
 };
 
-export default function StickyHeadTable() {
+const StickyHeadTable = () => {
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState(originalRows);
+  const [selectedCol, setSelectedCol] = React.useState<Column[]>(columns);
   const [filterFields, setFilterFields] = React.useState<FilterType>({
     columns: [],
-    actions: [],
+    actions: '',
     value: '',
   } as FilterType);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const handleChangePage = (
-    event:
-      | React.MouseEvent<HTMLButtonElement>
-      | React.ChangeEvent<HTMLInputElement>
-      | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
+  const handleChangePage =
+    (): // event: MouseEvent<HTMLButtonElement> | unknown | null,
+    // newPage: number
+    void => {
+      // setPage(newPage);
+    };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -67,12 +64,13 @@ export default function StickyHeadTable() {
   };
 
   const handleFilter = (value: FilterType) => {
-    console.log(filterFields, value);
-    if (value && value['columns'] && value['value']) {
+    console.log(value);
+    setFilterFields({ ...filterFields, ...value });
+
+    if (value && value['value'] && value['columns'][0]) {
       let filteredRows: OriginalRows[] = [];
       if (value['columns'].length === 1) {
         value['columns'].map((column) => {
-          console.log(typeof originalRows[0][column]);
           switch (typeof originalRows[0][column]) {
             case 'string': {
               filteredRows = originalRows.filter((row) => {
@@ -84,14 +82,13 @@ export default function StickyHeadTable() {
               break;
             }
             case 'number': {
-              if (!isNaN(+value['value']) && value.actions[0]) {
+              if (!isNaN(+value['value']) && value.actions !== '') {
                 filteredRows = originalRows.filter((row) => {
-                  console.log(value['value'], row[column]);
-                  if (value.actions[0] === 'equal') {
+                  if (value.actions === 'equal') {
                     return row[column] === parseInt(value['value']);
-                  } else if (value.actions[0] === 'greater') {
+                  } else if (value.actions === 'greater') {
                     return row[column] > parseInt(value['value']);
-                  } else if (value.actions[0] === 'lower') {
+                  } else if (value.actions === 'lower') {
                     return row[column] < parseInt(value['value']);
                   }
                 });
@@ -111,26 +108,34 @@ export default function StickyHeadTable() {
         });
       } else {
         filteredRows = originalRows.filter((row) => {
-          return value['columns'].indexOf('name')
-            ? row.name
-                .toLowerCase()
-                .includes(value['value'].toLowerCase().trim())
-            : false || value['columns'].indexOf('code')
-            ? row.code
-                .toLowerCase()
-                .includes(value['value'].toLowerCase().trim())
-            : false || value['columns'].indexOf('population')
-            ? row.population.toString().includes(value['value'].trim())
-            : false || value['columns'].indexOf('size')
-            ? row.size.toString().includes(value['value'].trim())
-            : false;
+          return (
+            (value['columns'].indexOf('name') !== -1
+              ? row.name
+                  .toLowerCase()
+                  .includes(value['value'].toLowerCase().trim())
+              : true) &&
+            (value['columns'].indexOf('code') !== -1
+              ? row.code
+                  .toLowerCase()
+                  .includes(value['value'].toLowerCase().trim())
+              : true) &&
+            (value['columns'].indexOf('population') !== -1
+              ? row.population.toString().includes(value['value'].trim())
+              : true) &&
+            (value['columns'].indexOf('size') !== -1
+              ? row.size.toString().includes(value['value'].trim())
+              : true)
+          );
         });
       }
       setRows(filteredRows);
     } else {
       setRows(originalRows);
     }
-    setFilterFields({ ...filterFields, ...value });
+  };
+
+  const handleSelectCol = (selCol: string[]) => {
+    setSelectedCol(columns.filter((col) => selCol.indexOf(col.id) !== -1));
   };
 
   return (
@@ -152,10 +157,14 @@ export default function StickyHeadTable() {
             />
           </div>
           <div className={classes.sectionDesktop}>
-            <Filter handleFilter={handleFilter} filterFields={filterFields} />
+            <Filter
+              handleFilter={handleFilter}
+              filterFields={filterFields}
+              filterableCol={selectedCol}
+            />
           </div>
           <div className={classes.sectionDesktop}>
-            <ColumnsAct />
+            <ColumnsAct options={columns} handleSelect={handleSelectCol} />
           </div>
         </Toolbar>
       </div>
@@ -163,7 +172,7 @@ export default function StickyHeadTable() {
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
+              {selectedCol.map((column) => (
                 <StyledTableCell
                   key={column.id}
                   align={column.align}
@@ -185,7 +194,7 @@ export default function StickyHeadTable() {
                     tabIndex={-1}
                     key={row.code}
                   >
-                    {columns.map((column) => {
+                    {selectedCol.map((column) => {
                       const value = row[column.id];
                       return (
                         <StyledTableCell key={column.id} align={column.align}>
@@ -219,4 +228,6 @@ export default function StickyHeadTable() {
       </TableContainer>
     </Paper>
   );
-}
+};
+
+export default StickyHeadTable;
